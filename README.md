@@ -1,4 +1,25 @@
+源自MediaCrawler，Fork之后定制化开发一些需求
+
+
+
+以下是更新记录：
+
+
+
+
+
+
+
+
+
+以下是原始Readme：
+
+------
+
+
+
 # 🔥 自媒体平台爬虫🕷️MediaCrawler🔥 
+
 <a href="https://trendshift.io/repositories/8291" target="_blank"><img src="https://trendshift.io/api/badge/repositories/8291" alt="NanmiCoder%2FMediaCrawler | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
 [![GitHub Stars](https://img.shields.io/github/stars/NanmiCoder/MediaCrawler?style=social)](https://github.com/NanmiCoder/MediaCrawler/stargazers)
@@ -56,11 +77,11 @@
    ```shell   
    # 进入项目根目录
    cd MediaCrawler
-   
+
    # 创建虚拟环境
    # 我的python版本是：3.9.6，requirements.txt中的库是基于这个版本的，如果是其他python版本，可能requirements.txt中的库不兼容，自行解决一下。
    python -m venv venv
-   
+
    # macos & linux 激活虚拟环境
    source venv/bin/activate
 
@@ -121,7 +142,7 @@
 # 项目微信交流群
 
 [加入微信交流群](https://nanmicoder.github.io/MediaCrawler/%E5%BE%AE%E4%BF%A1%E4%BA%A4%E6%B5%81%E7%BE%A4.html)
-  
+
 # 感谢下列Sponsors对本仓库赞助支持
 <a href="https://www.swiftproxy.net/?ref=nanmi">
 <img src="docs/static/images/img_5.png">
