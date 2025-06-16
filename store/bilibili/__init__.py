@@ -81,10 +81,12 @@ async def update_up_info(video_item: Dict):
         "sign": video_item_card.get("sign"),
         "avatar": video_item_card.get("face"), 
         "last_modify_ts": utils.get_current_timestamp(),  
+        "last_modify_datetime":datetime.now().strftime('%Y-%m-%d %H:%M:%S'),# 插入到数据库的时候，目前是时间戳的形式，补充为时间 [ Mia edited @ 2025.06.08 ]
         "total_fans": video_item_card.get("fans"), 
         "total_liked": video_item_card_list.get("like_num"), 
         "user_rank": video_item_card.get("level_info").get("current_level"),  
         "is_official": video_item_card.get("official_verify").get("type"), 
+        "video_count": video_item_card.get("video_count"), 
     }
     utils.logger.info(
         f"[store.bilibili.update_up_info] bilibili user_id:{video_item_card.get('mid')}")

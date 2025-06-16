@@ -129,6 +129,53 @@ async def query_creator_by_creator_id(creator_id: str) -> Dict:
         return rows[0]
     return dict()
 
+# [ Mia edited @ 2025.06.08 ]
+# 增加setting表有很多作用，包括：
+# 增加断点处重新开始，主要逻辑为开始某个博主的时候记录名称和时间，3天之内则从该博主名称的位置重新开始
+async def query_setting_by_key(key: str) -> Dict:
+    """
+    查询配置信息
+    Args:
+        key:
+
+    Returns:
+
+    """
+    async_db_conn: AsyncMysqlDB = media_crawler_db_var.get()
+    sql: str = f"select * from `setting` where `key` = '{key}'"
+    rows: List[Dict] = await async_db_conn.query(sql)
+    if len(rows) > 0:
+        return rows[0]
+    return dict()
+
+# 增加setting表有很多作用
+async def add_new_setting_key(item: Dict) -> int:
+    """
+    新增设置
+    Args:
+        item:
+
+    Returns:
+
+    """
+    async_db_conn: AsyncMysqlDB = media_crawler_db_var.get()
+    # item 是个字典信息，是需要存储的内容
+    last_row_id: int = await async_db_conn.item_to_table("setting", item)
+    return last_row_id
+
+async def update_setting_key(key: str, item: Dict) -> int:
+    """
+    更新设置
+    Args:
+        key:
+        item:
+    Returns:
+
+    """
+    async_db_conn: AsyncMysqlDB = media_crawler_db_var.get()
+    effect_row: int = await async_db_conn.update_table("setting", item, "`key`", key)
+    return effect_row
+
 
 async def add_new_creator(creator_item: Dict) -> int:
     """

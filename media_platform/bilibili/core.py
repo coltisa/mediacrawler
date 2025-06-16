@@ -15,6 +15,7 @@
 # @Desc    : B站爬虫
 
 import asyncio
+import keyword
 import os
 import random
 from asyncio import Task
@@ -22,12 +23,14 @@ from typing import Dict, List, Optional, Tuple, Union
 from datetime import datetime, timedelta
 import pandas as pd
 
+from config.base_config import BILI_CREATOR_LIST
 from playwright.async_api import (BrowserContext, BrowserType, Page, async_playwright)
 
 import config
 from base.base_crawler import AbstractCrawler
 from proxy.proxy_ip_pool import IpInfoModel, create_ip_pool
 from store import bilibili as bilibili_store
+from store.bilibili.bilibili_store_sql import update_setting_key,add_new_setting_key,query_setting_by_key
 from tools import utils
 from var import crawler_type_var, source_keyword_var
 
@@ -36,6 +39,8 @@ from .exception import DataFetchError
 from .field import SearchOrderType
 from .login import BilibiliLogin
 
+from datetime import datetime
+import sys
 
 class BilibiliCrawler(AbstractCrawler):
     context_page: Page
@@ -89,8 +94,59 @@ class BilibiliCrawler(AbstractCrawler):
                 # Get the information and comments of the specified post
                 await self.get_specified_videos(config.BILI_SPECIFIED_ID_LIST)
             elif config.CRAWLER_TYPE == "creator":
-                for creator_id in config.BILI_CREATOR_ID_LIST:
-                    await self.get_creator_videos(int(creator_id))
+                # 根据up主名字搜索 [ Mia edited @ 2025.06.06 ]
+                current_time = datetime.now()
+                # 增加断点处重新开始，主要逻辑为开始某个博主的时候记录名称和时间，72小时之内则从该博主名称的位置重新开始 [ Mia edited @ 2025.06.08 ]
+                bilibili_creator_break_point = await query_setting_by_key("bilibili_creator_break_point")
+                history_expiry_hours = 72
+                crawl_creator_init = True
+                if bilibili_creator_break_point:
+                    # target_trecord_datetimeime = datetime.strptime(target_time_str, "%Y-%m-%d %H:%M:%S")
+                    record_datetime = bilibili_creator_break_point["datetime"]
+                    time_diff = current_time - record_datetime
+                    if time_diff > timedelta(hours=history_expiry_hours):
+                        # 超过72小时，从头更新
+                        crawl_creator_init = True
+                    else:
+                        # 没超过72小时，断点开始
+                        crawl_creator_init = False
+                else:
+                    # 没有记录，从头更新
+                    crawl_creator_init = True
+                if crawl_creator_init:
+                    utils.logger.info(f"[BilibiliCrawler] 断点爬虫功能开启，没有历史爬虫记录或记录超过{history_expiry_hours}小时")
+                    for keyword in config.BILI_CREATOR_LIST:
+                        
+                        bilibili_creator_break_point = await query_setting_by_key("bilibili_creator_break_point")
+                        if bilibili_creator_break_point:
+                            # 如果已存在，则更新 bilibili_creator_break_point
+                            await update_setting_key("bilibili_creator_break_point",{"value":keyword,"datetime":current_time.strftime('%Y-%m-%d %H:%M:%S')})
+                        else:
+                            # 如果不存在，则新增 bilibili_creator_break_point
+                            await add_new_setting_key({"key":"bilibili_creator_break_point","value":keyword,"datetime":current_time.strftime('%Y-%m-%d %H:%M:%S')})
+                        get_creator = await self.search_creator(keyword)
+                        if get_creator:
+                            await self.get_creator_videos(int(get_creator[0]["mid"]))
+                        else:
+                            utils.logger.info(f"[BilibiliCrawler] 没有找到此用户：{keyword}")
+                else:
+                    
+                    creator_list = config.BILI_CREATOR_LIST
+                    last_break_creator = bilibili_creator_break_point["value"]
+                    utils.logger.info(f"[BilibiliCrawler] 断点爬虫功能开启，找到历史记录，从“{last_break_creator}”开始继续往下爬")
+                    
+                    remain_list = creator_list[creator_list.index(last_break_creator):]
+                    for keyword in remain_list:
+                        # 更新 bilibili_creator_break_point
+                        await update_setting_key("bilibili_creator_break_point",{"value":keyword,"datetime":current_time.strftime('%Y-%m-%d %H:%M:%S')})
+                        get_creator = await self.search_creator(keyword)
+                        if get_creator:
+                            await self.get_creator_videos(int(get_creator[0]["mid"]))
+                        else:
+                            utils.logger.info(f"[BilibiliCrawler] 没有找到此用户：{keyword}")
+                # 原版的根据up主ID爬取信息
+                # for creator_id in config.BILI_CREATOR_ID_LIST:
+                #     await self.get_creator_videos(int(creator_id))
             else:
                 pass
             utils.logger.info(
@@ -171,6 +227,7 @@ class BilibiliCrawler(AbstractCrawler):
                         if video_item:
                             video_id_list.append(video_item.get("View").get("aid"))
                             await bilibili_store.update_bilibili_video(video_item)
+                            # while search, update up info [ Mia edited @ 2025.05.01 ]
                             await bilibili_store.update_up_info(video_item)
                             await self.get_bilibili_video(video_item, semaphore)
                     page += 1
@@ -212,6 +269,7 @@ class BilibiliCrawler(AbstractCrawler):
                                 if video_item:
                                     video_id_list.append(video_item.get("View").get("aid"))
                                     await bilibili_store.update_bilibili_video(video_item)
+                                    # while search, update up info [ Mia edited @ 2025.05.01 ]
                                     await bilibili_store.update_up_info(video_item)
                                     await self.get_bilibili_video(video_item, semaphore)
                             page += 1
@@ -220,7 +278,21 @@ class BilibiliCrawler(AbstractCrawler):
                         except Exception as e:
                             print(e)
                             break
-
+    # 新增函数，根据关键字搜索UP主 [ Mia edited @ 2025.06.06 ]
+    async def search_creator(self,keyword):
+        videos_res = await self.bili_client.search_creator_by_keyword(
+                        keyword=keyword,
+                        page=1,
+                        page_size=20,
+                        order=SearchOrderType.DEFAULT,
+                        pubtime_begin_s=0,  # 作品发布日期起始时间戳，针对搜索up主名字是好像没有用
+                        pubtime_end_s=0  # 作品发布日期结束日期时间戳，针对搜索up主名字是好像没有用
+                    )
+        
+        return videos_res.get("result")
+        
+        
+        
     async def batch_get_video_comments(self, video_id_list: List[str]):
         """
         batch get video comments
@@ -284,9 +356,12 @@ class BilibiliCrawler(AbstractCrawler):
                 break
             await asyncio.sleep(random.random())
             pn += 1
-        await self.get_specified_videos(video_bvids_list)
+        # video number of this creator [ Mia edited @ 2025.05.01 ]
+        video_count = len(video_bvids_list)
+        
+        await self.get_specified_videos(video_bvids_list,video_count)
 
-    async def get_specified_videos(self, bvids_list: List[str]):
+    async def get_specified_videos(self, bvids_list: List[str],video_count):
         """
         get specified videos info
         :return:
@@ -305,6 +380,9 @@ class BilibiliCrawler(AbstractCrawler):
                 if video_aid:
                     video_aids_list.append(video_aid)
                 await bilibili_store.update_bilibili_video(video_detail)
+                # get specified video, update up info [ Mia edited @ 2025.05.01 ]
+                print(f"视频细节：{video_detail}")
+                video_detail["Card"]["card"]["video_count"] = video_count
                 await bilibili_store.update_up_info(video_detail)
                 await self.get_bilibili_video(video_detail, semaphore)
         await self.batch_get_video_comments(video_aids_list)

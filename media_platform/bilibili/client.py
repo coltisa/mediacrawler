@@ -140,6 +140,7 @@ class BilibiliClient(AbstractApiClient):
         :param pubtime_end_s: 发布时间结束时间戳
         :return:
         """
+        print(f"搜索内容{keyword}")
         uri = "/x/web-interface/wbi/search/type"
         post_data = {
             "search_type": "video",
@@ -151,7 +152,41 @@ class BilibiliClient(AbstractApiClient):
             "pubtime_end_s": pubtime_end_s
         }
         return await self.get(uri, post_data)
+    # 新增函数，根据关键字搜索UP主 [ Mia edited @ 2025.06.06 ]
+    async def search_creator_by_keyword(self, keyword: str, page: int = 1, page_size: int = 20,
+                                      order: SearchOrderType = SearchOrderType.DEFAULT,
+                                      pubtime_begin_s: int = 0, pubtime_end_s: int = 0) -> Dict:
 
+        """
+        KuaiShou web search api
+        :param keyword: 搜索关键词
+        :param page: 分页参数具体第几页
+        :param page_size: 每一页参数的数量
+        :param order: 搜索结果排序，默认位综合排序
+        :param pubtime_begin_s: 发布时间开始时间戳
+        :param pubtime_end_s: 发布时间结束时间戳
+        :return:
+        """
+        
+        # 搜索用户时候的GET参数示意
+        # https://api.bilibili.com/x/web-interface/wbi/search/type?category_id=&search_type=bili_user&ad_resource=5646&__refresh__=true&_extra=&context=&page=1&page_size=36&order=&pubtime_begin_s=0&pubtime_end_s=0&duration=&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=%E6%88%91%E5%8F%AB%E5%B0%8F%E7%BA%AA&qv_id=1kHklTrLxvG5dpIHjyJC8nADmpQbcQ0i&source_tag=3&gaia_vtoken=&order_sort=0&user_type=0&dynamic_offset=0&web_location=1430654&w_rid=bac42a975ed267d18e334b32d3762691&wts=1749221572
+        # 粉丝高低顺序排序
+        # https://api.bilibili.com/x/web-interface/wbi/search/type?category_id=&search_type=bili_user&ad_resource=5646&__refresh__=true&_extra=&context=&page=1&page_size=36&order=fans&pubtime_begin_s=0&pubtime_end_s=0&duration=&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=YOLO%E5%85%88%E7%94%9F&qv_id=cXUVmuKQlfljwvuPT9RTBsl3E4pPrthz&source_tag=3&gaia_vtoken=&order_sort=0&user_type=0&dynamic_offset=0&web_location=1430654&w_rid=b192e91e5279ac6ac3f57e53716c3ee5&wts=1749222980
+        
+        # 搜索视频时候的GET参数示意
+        # https://api.bilibili.com/x/web-interface/wbi/search/type?category_id=&search_type=video&ad_resource=5654&__refresh__=true&_extra=&context=&page=1&page_size=42&pubtime_begin_s=0&pubtime_end_s=0&from_source=&from_spmid=333.337&platform=pc&highlight=1&single_column=0&keyword=%E6%88%91%E5%8F%AB%E5%B0%8F%E7%BA%AA&qv_id=mGUeTXJ8OEy60f4k7jG1VZ6eNINLJIB6&source_tag=3&gaia_vtoken=&dynamic_offset=0&page_exp=0&web_location=1430654&w_rid=220f331d007eacf0d20b3ad4964f5899&wts=1749221679
+        uri = "/x/web-interface/wbi/search/type"
+        post_data = {
+            "search_type": "bili_user",
+            "keyword": keyword,
+            "page": page,
+            "page_size": page_size,
+            "order": "fans", # 粉丝高低顺序排序
+            "pubtime_begin_s": pubtime_begin_s,
+            "pubtime_end_s": pubtime_end_s
+        }
+        return await self.get(uri, post_data)
+    
     async def get_video_info(self, aid: Union[int, None] = None, bvid: Union[str, None] = None) -> Dict:
         """
         Bilibli web video detail api, aid 和 bvid任选一个参数

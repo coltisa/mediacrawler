@@ -1,3 +1,20 @@
+
+-- ----------------------------
+-- Table structure for DB setting
+-- ----------------------------
+-- # 增加setting表有很多作用 [ Mia edited @ 2025.06.08 ]
+DROP TABLE IF EXISTS `setting`;
+CREATE TABLE `setting`
+(
+    `id`             int         NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `key`            varchar(64) NOT NULL COMMENT '键',
+    `value`          varchar(64)  DEFAULT NULL COMMENT '值',
+    `datetime`       datetime  DEFAULT NULL COMMENT '时间',
+    `remark`         longtext COMMENT '文本',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='配置';
+
+
 -- ----------------------------
 -- Table structure for bilibili_video
 -- ----------------------------
@@ -64,7 +81,8 @@ CREATE TABLE `bilibili_up_info`
     `user_id`        varchar(64)  DEFAULT NULL COMMENT '用户ID',
     `nickname`       varchar(64)  DEFAULT NULL COMMENT '用户昵称',
     `sex`            varchar(64) DEFAULT NULL COMMENT '用户性别',
-    `sign`           varchar(64) DEFAULT NULL COMMENT '用户签名',
+    -- [ Mia edited @ 2025.06.06 ]
+    `sign`           longtext COMMENT '用户签名',
     `avatar`         varchar(255) DEFAULT NULL COMMENT '用户头像地址',
     `add_ts`         bigint NOT NULL COMMENT '记录添加时间戳',
     `last_modify_ts` bigint NOT NULL COMMENT '记录最后修改时间戳',
@@ -72,6 +90,10 @@ CREATE TABLE `bilibili_up_info`
     `total_liked`    bigint       DEFAULT NULL COMMENT '总获赞数',
     `user_rank`      int          DEFAULT NULL COMMENT '用户等级',
     `is_official`    int          DEFAULT NULL COMMENT '是否官号',
+    -- [ Mia edited @ 2025.05.01 ]
+    `video_count`    varchar(64) DEFAULT NULL COMMENT '用户头像地址',
+    `add_datetime`         datetime NOT NULL COMMENT '记录添加时间',
+    `last_modify_datetime` datetime NOT NULL COMMENT '记录最后修改时间',
     PRIMARY KEY (`id`),
     KEY              `idx_bilibili_vi_user_123456` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='B 站UP主信息';

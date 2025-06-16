@@ -1,20 +1,37 @@
 # 说明
 
-（由于比较复杂，暂时放弃）源自MediaCrawler，Fork之后定制化开发一些需求
+源自MediaCrawler，Fork之后定制化开发一些需求
+
+实测小红书（主要为风控，触发图形验证码）和抖音爬虫都会有问题，只有bilibili会正常
 
 ## 注意事项
 
 1.使用Python 3.9.6版本
 
-
+在线文档：[MediaCrawler使用方法 | MediaCrawler自媒体爬虫](https://nanmicoder.github.io/MediaCrawler/)
 
 ## 更新记录
 
+2025年5月1日
 
+更新标签为[ Mia edited @ 2025.05.01 ]
 
+- 增加bilibili up主的视频数量统计
 
+2025年6月7日
 
+更新标签为[ Mia edited @ 2025.06.06 ]
 
+- 更新代码，根据up主名称爬取up信息，主要逻辑为复制search video相关函数，改为search用户
+- 将数据库字段sign改为longtext，修复sign内容过长，导致MySQL插入崩溃的问题
+- 
+
+2025年6月8日
+
+更新标签为[ Mia edited @ 2025.06.08 ]
+
+- 爬取创作者主页的时候，插入到数据库的时候，目前是时间戳的形式，补充为时间
+- 增加断点处重新开始，主要逻辑为开始某个博主的时候记录名称和时间，72小时之内则从该博主名称的位置重新开始
 
 
 
@@ -135,10 +152,8 @@
 
 
 # 其他常见问题可以查看在线文档
-> 
 > 在线文档包含使用方法、常见问题、加入项目交流群等。
 > [MediaCrawler在线文档](https://nanmicoder.github.io/MediaCrawler/)
-> 
 
 # 作者提供的知识服务
 > 如果想快速入门和学习该项目的使用、源码架构设计等、学习编程技术、亦或者想了解MediaCrawlerPro的源代码设计可以看下我的知识付费栏目。

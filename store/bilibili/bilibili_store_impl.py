@@ -27,6 +27,8 @@ from base.base_crawler import AbstractStore
 from tools import utils, words
 from var import crawler_type_var
 
+from datetime import datetime
+
 
 def calculate_number_of_files(file_store_path: str) -> int:
     """计算数据保存文件的前部分排序数字，支持每次运行代码不写到同一个文件中
@@ -163,11 +165,17 @@ class BiliDbStoreImplement(AbstractStore):
 
         from .bilibili_store_sql import (add_new_creator,
                                          query_creator_by_creator_id,
-                                         update_creator_by_creator_id)
+                                         update_creator_by_creator_id,
+                                         query_setting_by_key)
         creator_id = creator.get("user_id")
+        
         creator_detail: Dict = await query_creator_by_creator_id(creator_id=creator_id)
         if not creator_detail:
+            
             creator["add_ts"] = utils.get_current_timestamp()
+            # 插入到数据库的时候，目前是时间戳的形式，补充为时间 [ Mia edited @ 2025.06.08 ]
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            creator["add_datetime"] = current_time
             await add_new_creator(creator)
         else:
             await update_creator_by_creator_id(creator_id,creator_item=creator)

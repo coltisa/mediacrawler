@@ -10,13 +10,22 @@
 
 
 # 基础配置
-PLATFORM = "xhs"
-KEYWORDS = "宝藏大飞,我叫小纪"  # 关键词搜索配置，以英文逗号分隔
+# xhs | dy | ks | bili | wb | tieba | zhihu
+PLATFORM = "bili"
+# 关键词搜索配置，以英文逗号分隔
+KEYWORDS = "宝藏大飞,我叫小纪,YOLO先生,Ted说,乘风聊科技,菜阿玛,mr.lu的日常,我叫天涯,酷der科技圈,钟文泽,大眼的数码生活,科技西西米,马鹿blyat,先看评测,苏星河牛通,普普通通tony大叔,硬件茶谈,科技美学,HEY瑞科技,西西的数码笔记,大狸子切切里,TESTV官方频道,韭菜实验室,笔吧评测室,阿狸才不是受,科技狐,林捂捂,暗夜光学,虫虫的装修日记,张超人全屋智能,自装绿米苹果全屋智能,喵一只,小乐全屋智能,Get A Life"
 LOGIN_TYPE = "qrcode"  # qrcode or phone or cookie
 COOKIES = ""
 # 具体值参见media_platform.xxx.field下的枚举值，暂时只支持小红书
+# general: General
+# popularity_descending: Most popular
+# time_descending: Latest
 SORT_TYPE = "popularity_descending"
 # 具体值参见media_platform.xxx.field下的枚举值，暂时只支持抖音
+# 0  # 不限
+# 1  # 一天内
+# 7  # 一周内
+# 180  # 半年内
 PUBLISH_TIME_TYPE = 0
 CRAWLER_TYPE = (
     "creator"  # 爬取类型，search(关键词搜索) | detail(帖子详情)| creator(创作者主页数据)
@@ -28,7 +37,9 @@ UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like 
 ENABLE_IP_PROXY = False
 
 # 未启用代理时的最大爬取间隔，单位秒（暂时仅对XHS有效）
-CRAWLER_MAX_SLEEP_SEC = 2
+# 目前设置为5秒是没有问题的
+CRAWLER_MAX_SLEEP_SEC = 10
+CRAWLER_MIN_SLEEP_SEC = 5
 
 # 代理IP池数量
 IP_PROXY_POOL_COUNT = 2
@@ -64,7 +75,7 @@ MAX_CONCURRENCY_NUM = 1
 ENABLE_GET_IMAGES = False
 
 # 是否开启爬评论模式, 默认开启爬评论
-ENABLE_GET_COMMENTS = True
+ENABLE_GET_COMMENTS = False
 
 # 爬取一级评论的数量控制(单视频/帖子)
 CRAWLER_MAX_COMMENTS_COUNT_SINGLENOTES = 10
@@ -88,8 +99,8 @@ XHS_SPECIFIED_NOTE_URL_LIST = [
 
 # 指定抖音需要爬取的ID列表
 DY_SPECIFIED_ID_LIST = [
-    "7280854932641664319",
-    "7202432992642387233",
+    "71989951534",
+    "zhongwenze",
     # ........................
 ]
 
@@ -132,20 +143,61 @@ TIEBA_CREATOR_URL_LIST = [
 
 # 指定小红书创作者ID列表
 XHS_CREATOR_ID_LIST = [
-    "63e36c9a000000002703502b",
+    "5fbe84240000000001001ebe",
     # ........................
 ]
 
 # 指定Dy创作者ID列表(sec_id)
 DY_CREATOR_ID_LIST = [
-    "MS4wLjABAAAATJPY7LAlaa5X-c8uNdWkvz0jUGgpw4eeXIwu_8BhvqE",
+    "MS4wLjABAAAAlu4SSxra3t-VDZL_1nk4_VnHJOnHY35cNDTxIW4t88vfHfxnjJM4pFyROYpBvKxf",
+    "MS4wLjABAAAAxLOQi_eSfRg00aVSVxBV-I4QjEeJoOnrsPz-zIXv32g"
     # ........................
 ]
 
 # 指定bili创作者ID列表(sec_id)
 BILI_CREATOR_ID_LIST = [
-    "20813884",
+    "30455976",
+    "515223751",
+    "1759259349",
+    "207883786",
+    "3546614778038877",
+    "1279426201",
+    "25910292",
     # ........................
+]
+
+# 指定bili up主名字清单 [ Mia edited @ 2025.06.06 ]
+BILI_CREATOR_LIST = [
+    "宝藏大飞",
+    "我叫小纪",
+    "YOLO先生",
+    "Ted说",
+    "乘风聊科技",
+    "菜阿玛",
+    "mr.lu的日常",
+    "我叫天涯",
+    "酷der科技圈",
+    "钟文泽",
+    "大眼的数码生活",
+    "科技西西米",
+    "马鹿blyat",
+    "先看评测",
+    "苏星河牛通",
+    "普普通通tony大叔",
+    "硬件茶谈",
+    "科技美学",
+    "HEY瑞科技",
+    "西西的数码笔记",
+    "大狸子切切里",
+    "TESTV官方频道",
+    "韭菜实验室",
+    "笔吧评测室",
+    "阿狸才不是受",
+    "科技狐",
+    "林捂捂",
+    "暗夜光学",
+    "极客代码君",
+    "阿圆的数码宇宙"
 ]
 
 # 指定快手创作者ID列表

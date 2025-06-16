@@ -92,7 +92,7 @@ class XiaoHongShuCrawler(AbstractCrawler):
                 await self.xhs_client.update_cookies(
                     browser_context=self.browser_context
                 )
-
+            # 获取爬虫的类型
             crawler_type_var.set(config.CRAWLER_TYPE)
             if config.CRAWLER_TYPE == "search":
                 # Search for notes and retrieve their comment information.
@@ -182,7 +182,7 @@ class XiaoHongShuCrawler(AbstractCrawler):
                         "[XiaoHongShuCrawler.search] Get note detail error"
                     )
                     break
-
+    
     async def get_creators_and_notes(self) -> None:
         """Get creator's notes and retrieve their comment information."""
         utils.logger.info(
@@ -200,7 +200,7 @@ class XiaoHongShuCrawler(AbstractCrawler):
             if config.ENABLE_IP_PROXY:
                 crawl_interval = random.random()
             else:
-                crawl_interval = random.uniform(1, config.CRAWLER_MAX_SLEEP_SEC)
+                crawl_interval = random.uniform(config.CRAWLER_MIN_SLEEP_SEC, config.CRAWLER_MAX_SLEEP_SEC)
             # Get all note information of the creator
             all_notes_list = await self.xhs_client.get_all_notes_by_creator(
                 user_id=user_id,
@@ -290,7 +290,7 @@ class XiaoHongShuCrawler(AbstractCrawler):
             if config.ENABLE_IP_PROXY:
                 crawl_interval = random.random()
             else:
-                crawl_interval = random.uniform(1, config.CRAWLER_MAX_SLEEP_SEC)
+                crawl_interval = random.uniform(config.CRAWLER_MIN_SLEEP_SEC, config.CRAWLER_MAX_SLEEP_SEC)
             try:
                 # 尝试直接获取网页版笔记详情，携带cookie
                 note_detail_from_html: Optional[Dict] = (
@@ -370,7 +370,7 @@ class XiaoHongShuCrawler(AbstractCrawler):
             if config.ENABLE_IP_PROXY:
                 crawl_interval = random.random()
             else:
-                crawl_interval = random.uniform(1, config.CRAWLER_MAX_SLEEP_SEC)
+                crawl_interval = random.uniform(config.CRAWLER_MIN_SLEEP_SEC, config.CRAWLER_MAX_SLEEP_SEC)
             await self.xhs_client.get_note_all_comments(
                 note_id=note_id,
                 xsec_token=xsec_token,

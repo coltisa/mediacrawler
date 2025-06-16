@@ -48,6 +48,9 @@ async def get_a_bogus(url: str, params: str, post_data: dict, user_agent: str, p
     """
     获取 a_bogus 参数, 目前不支持post请求类型的签名
     """
+    print(url)
+    print(params)
+    print(user_agent)
     return get_a_bogus_from_js(url, params, user_agent)
 
 def get_a_bogus_from_js(url: str, params: str, user_agent: str):
